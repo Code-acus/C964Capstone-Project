@@ -1,7 +1,9 @@
+import algorithm as algorithm
 import pandas as pd
 import plotly.express as px
 from scipy.stats._morestats import Mean
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 
 # Load data into a Pandas dataframe
