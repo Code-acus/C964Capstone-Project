@@ -31,7 +31,7 @@ class App:
 
     def predict_diabetes(input_df):
         # Load the dataset
-        df = pd.read_csv('diabetes.csv')
+        df = pd.read_csv('diabetes_data.csv')
 
         # Split the data into training and testing sets
         X = df.drop('Outcome', axis=1)
