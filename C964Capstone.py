@@ -6,8 +6,25 @@ import os
 import tkinter as tk
 from tkinter import messagebox
 import pandas as pd
-from sklearn import svm
-from sklearn.model_selection import train_test_split
+from joblib import load
+from sklearn.preprocessing import StandardScaler
+
+
+def predict_diabetes(input_df):
+    # load the model
+    model_path = os.path.join(os.path.dirname(__file__), 'model', 'diabetes_model.joblib')
+    model = load(model_path)
+
+    # preprocess the input data
+    scaler = StandardScaler()
+    input_df = scaler.fit_transform(input_df)
+
+    # predict the input data
+    prediction = model.predict(input_df)
+    if prediction == 0:
+        return "You do not have diabetes"
+    else:
+        return "You have diabetes"
 
 
 class App:
@@ -63,41 +80,23 @@ class App:
                 'SkinThickness': [int(self.skin_thickness_entry.get())],
                 'Insulin': [int(self.insulin_entry.get())],
                 'BMI': [float(self.bmi_entry.get())],
-                'DiabetesPedigreeFunction': [float(self.diabetes_pedigree_function_entry.get())]
+                'DiabetesPedigreeFunction': [
+                    float(self.diabetes_pedigree_function_entry.get())]
             }
             input_df = pd.DataFrame(input_data)
-            prediction = self.predict_diabetes(input_df)
+            prediction = predict_diabetes(input_df)
             messagebox.showinfo("Prediction", prediction)
         except ValueError:
             messagebox.showerror("Error", "Please enter valid values")
 
-    def predict_diabetes(self, input_df):
-        # Get the absolute path of the csv file
-        csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "diabetes_data.csv"))
-        # Read the data from the csv file
-        df = pd.read_csv(csv_path)
-        # Split the data into features and labels
-        X = df.drop('Outcome', axis=1)
-        y = df['Outcome']
-        # Split the data into training and testing sets
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-        # Create the model
-        model = svm.SVC(kernel='linear')
-        # Train the model
-        model.fit(X_train, y_train)
 
-        # Predict the outcome
-        prediction = model.predict(input_df)
-        if prediction == 1:
-            return "Diabetes"
-        else:
-            return "No Diabetes"
-
-root = tk.Tk()
-root.title("Diabetes Predictor")
-app = App(root)
-root.mainloop()
-
+if __name__ == "__main__":
+    root = tk.Tk()
+    root.title("Diabetes Predictor")
+    root.geometry("300x300")
+    app = App(root)
+    root.mainloop()
+    
 # Path: C964Capstone.py
 # The code below is the code for the Diabetes Predictor app without the GUI.
 # It is a simple app that takes in the values for the 7 features and predicts whether the patient has diabetes or not.
