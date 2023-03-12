@@ -2,97 +2,99 @@
 # It is a simple app that takes in the values for the 7 features and predicts whether the patient has diabetes or not.
 # The app is built using the scikit-learn library.
 
+import os
 import tkinter as tk
 from tkinter import messagebox
 import pandas as pd
 from sklearn import svm
 from sklearn.model_selection import train_test_split
 
+
 class App:
     def __init__(self, master):
         self.master = master
 
+        # Create input fields and labels
+        self.pregnancies_label = tk.Label(master, text="Pregnancies:")
+        self.pregnancies_label.grid(row=0, column=0)
+        self.pregnancies_entry = tk.Entry(master)
+        self.pregnancies_entry.grid(row=0, column=1)
+
+        self.glucose_label = tk.Label(master, text="Glucose:")
+        self.glucose_label.grid(row=1, column=0)
+        self.glucose_entry = tk.Entry(master)
+        self.glucose_entry.grid(row=1, column=1)
+
+        self.blood_pressure_label = tk.Label(master, text="Blood Pressure:")
+        self.blood_pressure_label.grid(row=2, column=0)
+        self.blood_pressure_entry = tk.Entry(master)
+        self.blood_pressure_entry.grid(row=2, column=1)
+
+        self.skin_thickness_label = tk.Label(master, text="Skin Thickness:")
+        self.skin_thickness_label.grid(row=3, column=0)
+        self.skin_thickness_entry = tk.Entry(master)
+        self.skin_thickness_entry.grid(row=3, column=1)
+
+        self.insulin_label = tk.Label(master, text="Insulin:")
+        self.insulin_label.grid(row=4, column=0)
+        self.insulin_entry = tk.Entry(master)
+        self.insulin_entry.grid(row=4, column=1)
+
+        self.bmi_label = tk.Label(master, text="BMI:")
+        self.bmi_label.grid(row=5, column=0)
+        self.bmi_entry = tk.Entry(master)
+        self.bmi_entry.grid(row=5, column=1)
+
+        self.diabetes_pedigree_function_label = tk.Label(master, text="Diabetes Pedigree Function:")
+        self.diabetes_pedigree_function_label.grid(row=6, column=0)
+        self.diabetes_pedigree_function_entry = tk.Entry(master)
+        self.diabetes_pedigree_function_entry.grid(row=6, column=1)
+
+        # Create the predict button
+        self.predict_button = tk.Button(master, text="Predict", command=self.predict)
+        self.predict_button.grid(row=7, column=0, columnspan=2)
+
     def predict(self):
         try:
             input_data = {
-                'Pregnancies': [int(pregnancies_entry.get())],
-                'Glucose': [int(glucose_entry.get())],
-                'BloodPressure': [int(blood_pressure_entry.get())],
-                'SkinThickness': [int(skin_thickness_entry.get())],
-                'Insulin': [int(insulin_entry.get())],
-                'BMI': [float(bmi_entry.get())],
-                'DiabetesPedigreeFunction': [float(diabetes_pedigree_function_entry.get())]
+                'Pregnancies': [int(self.pregnancies_entry.get())],
+                'Glucose': [int(self.glucose_entry.get())],
+                'BloodPressure': [int(self.blood_pressure_entry.get())],
+                'SkinThickness': [int(self.skin_thickness_entry.get())],
+                'Insulin': [int(self.insulin_entry.get())],
+                'BMI': [float(self.bmi_entry.get())],
+                'DiabetesPedigreeFunction': [float(self.diabetes_pedigree_function_entry.get())]
             }
             input_df = pd.DataFrame(input_data)
-            prediction = App.predict_diabetes(input_df)
-            messagebox.showinfo("Prediction", "The patient is " + prediction)
+            prediction = self.predict_diabetes(input_df)
+            messagebox.showinfo("Prediction", prediction)
         except ValueError:
             messagebox.showerror("Error", "Please enter valid values")
 
-    def predict_diabetes(input_df):
-        # Load the dataset
-        df = pd.read_csv('diabetes_data.csv')
-
-        # Split the data into training and testing sets
+    def predict_diabetes(self, input_df):
+        # Get the absolute path of the csv file
+        csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "diabetes_data.csv"))
+        # Read the data from the csv file
+        df = pd.read_csv(csv_path)
+        # Split the data into features and labels
         X = df.drop('Outcome', axis=1)
         y = df['Outcome']
+        # Split the data into training and testing sets
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-
-        # Train the model
+        # Create the model
         model = svm.SVC(kernel='linear')
+        # Train the model
         model.fit(X_train, y_train)
 
-        # Make predictions
-        predictions = model.predict(X_test)
+        # Predict the outcome
+        prediction = model.predict(input_df)
+        if prediction == 1:
+            return "Diabetes"
+        else:
+            return "No Diabetes"
 
-        # Return the prediction
-        return model.predict(input_df)
-
-# Create the GUI
 root = tk.Tk()
 root.title("Diabetes Predictor")
-
-# Create input fields and labels
-pregnancies_label = tk.Label(root, text="Pregnancies:")
-pregnancies_label.grid(row=0, column=0)
-pregnancies_entry = tk.Entry(root)
-pregnancies_entry.grid(row=0, column=1)
-
-glucose_label = tk.Label(root, text="Glucose:")
-glucose_label.grid(row=1, column=0)
-glucose_entry = tk.Entry(root)
-glucose_entry.grid(row=1, column=1)
-
-blood_pressure_label = tk.Label(root, text="Blood Pressure:")
-blood_pressure_label.grid(row=2, column=0)
-blood_pressure_entry = tk.Entry(root)
-blood_pressure_entry.grid(row=2, column=1)
-
-skin_thickness_label = tk.Label(root, text="Skin Thickness:")
-skin_thickness_label.grid(row=3, column=0)
-skin_thickness_entry = tk.Entry(root)
-skin_thickness_entry.grid(row=3, column=1)
-
-insulin_label = tk.Label(root, text="Insulin:")
-insulin_label.grid(row=4, column=0)
-insulin_entry = tk.Entry(root)
-insulin_entry.grid(row=4, column=1)
-
-bmi_label = tk.Label(root, text="BMI:")
-bmi_label.grid(row=5, column=0)
-bmi_entry = tk.Entry(root)
-bmi_entry.grid(row=5, column=1)
-
-diabetes_pedigree_function_label = tk.Label(root, text="Diabetes Pedigree Function:")
-diabetes_pedigree_function_label.grid(row=6, column=0)
-diabetes_pedigree_function_entry = tk.Entry(root)
-diabetes_pedigree_function_entry.grid(row=6, column=1)
-
-# Create the predict button
-predict_button = tk.Button(root, text="Predict", command=App.predict)
-predict_button.grid(row=7, column=0, columnspan=2)
-
-# Run the app
 app = App(root)
 root.mainloop()
 
