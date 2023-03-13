@@ -96,7 +96,7 @@ if __name__ == "__main__":
     root.geometry("300x300")
     app = App(root)
     root.mainloop()
-    
+
 # Path: C964Capstone.py
 # The code below is the code for the Diabetes Predictor app without the GUI.
 # It is a simple app that takes in the values for the 7 features and predicts whether the patient has diabetes or not.
